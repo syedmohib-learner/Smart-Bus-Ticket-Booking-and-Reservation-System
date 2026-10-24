@@ -1,0 +1,139 @@
+================================================================================
+SMART BUS TICKET BOOKING & RESERVATION SYSTEM - TEST CASES & EXECUTION LOG
+================================================================================
+Project: Smart Bus Ticket Booking & Reservation System
+Testing Framework: Python unittest & Functional UI/System Verification
+Date: October 2026
+Overall Test Suite Result: PASS (All tests passed successfully)
+================================================================================
+
+TEST EXECUTION MATRIX:
+
+--------------------------------------------------------------------------------
+Test ID: TC-01
+Scenario: View All Routes
+Input / Action: Choose 'View Available Routes' or inspect default routes list
+Expected Result: All five starter routes (R101-R105) and their initial seat availability (all seats available) appear.
+Actual Result: All 5 routes loaded with full seat capacity (40, 36, 32, 45, 30) and status 'Available'.
+Outcome: PASS
+Unit Test Mapping: test_01_routes_initialization
+
+--------------------------------------------------------------------------------
+Test ID: TC-02
+Scenario: Search Routes by Known City (Hyderabad)
+Input / Action: Search city 'Hyderabad' (case-insensitive)
+Expected Result: Routes departing from or arriving at Hyderabad appear (R101, R103, R105).
+Actual Result: Exactly 3 routes returned (R101 Karachi->Hyderabad, R103 Hyderabad->Mirpur Khas, R105 Sukkur->Hyderabad).
+Outcome: PASS
+Unit Test Mapping: test_02_route_search_matching
+
+--------------------------------------------------------------------------------
+Test ID: TC-03
+Scenario: Search Routes by Unknown City (Atlantis)
+Input / Action: Search query 'Atlantis'
+Expected Result: Helpful no-match message displayed; program continues execution normally without error.
+Actual Result: Search returned empty list; UI shows warning: "No routes found matching 'Atlantis'".
+Outcome: PASS
+Unit Test Mapping: test_03_route_search_unknown_city
+
+--------------------------------------------------------------------------------
+Test ID: TC-04
+Scenario: Book Two Seats on Route R101
+Input / Action: Passenger: 'Ahmed', Age: 24, Route: 'R101', Seats: 2
+Expected Result: Booking confirmed for Rs. 2,400 (Rs. 1,200 * 2); R101 available seats drop from 40 to 38; unique ID issued (B1001).
+Actual Result: Booking B1001 confirmed for Rs. 2,400; R101 available seats updated to 38.
+Outcome: PASS
+Unit Test Mapping: test_04_valid_booking_creates_unique_id, test_05_fare_calculation, test_06_booking_reduces_available_seats
+
+--------------------------------------------------------------------------------
+Test ID: TC-05
+Scenario: Attempt Booking with Zero or Negative Seats
+Input / Action: Passenger: 'Ahmed', Age: 24, Route: 'R101', Seats: 0
+Expected Result: Validation rejection; no booking created; no seat change on route.
+Actual Result: Rejected with error: "Requested seat quantity must be an integer greater than zero." Zero seats changed.
+Outcome: PASS
+Unit Test Mapping: test_09_invalid_seat_quantity_rejected
+
+--------------------------------------------------------------------------------
+Test ID: TC-06
+Scenario: Attempt Overbooking (Too Many Seats)
+Input / Action: Passenger: 'Ahmed', Age: 24, Route: 'R101' (40 available), Seats: 41
+Expected Result: Validation rejection; available seats never become negative; no booking record created.
+Actual Result: Rejected with message: "Cannot book 41 seat(s). Route R101 only has 40 seat(s) available." Available seats stay 40.
+Outcome: PASS
+Unit Test Mapping: test_10_overbooking_rejected
+
+--------------------------------------------------------------------------------
+Test ID: TC-07
+Scenario: Cancel an Existing Confirmed Booking
+Input / Action: Provide Confirmed Booking ID 'B1001' (which reserved 2 seats on R101)
+Expected Result: Status changes to 'Cancelled'; exactly 2 seats are restored to R101; cancellation confirmed.
+Actual Result: Booking B1001 marked 'Cancelled'; R101 available seats restored from 38 to 40.
+Outcome: PASS
+Unit Test Mapping: test_12_confirmed_booking_can_be_cancelled, test_13_cancellation_restores_seats
+
+--------------------------------------------------------------------------------
+Test ID: TC-08
+Scenario: Attempt to Cancel the Same Booking Again
+Input / Action: Repeat cancellation request for booking 'B1001' (already 'Cancelled')
+Expected Result: Request rejected; error message displayed; no additional seat restoration occurs.
+Actual Result: Rejection message: "Booking 'B1001' is already cancelled. Seats cannot be restored again." Availability unchanged.
+Outcome: PASS
+Unit Test Mapping: test_14_cannot_cancel_same_booking_twice
+
+--------------------------------------------------------------------------------
+Test ID: TC-09
+Scenario: Generate Booking Report with No Bookings
+Input / Action: Request report generation when bookings list is empty
+Expected Result: Booking counts and revenue are 0; route status and capacity are still accurately counted.
+Actual Result: Total Bookings: 0, Confirmed: 0, Cancelled: 0, Reserved Seats: 0, Revenue: Rs. 0. Routes: 5. Report generated cleanly.
+Outcome: PASS
+Unit Test Mapping: test_17_empty_bookings_zero_metrics
+
+--------------------------------------------------------------------------------
+Test ID: TC-10
+Scenario: Book All Remaining Seats (Full Booking)
+Input / Action: Request booking for all 30 remaining seats on Route R105
+Expected Result: Booking succeeds; R105 available seats become 0; Route status transitions to 'Fully Booked'.
+Actual Result: Booking confirmed; R105 available seats = 0; status updated to 'Fully Booked'; fully booked routes metric increments to 1.
+Outcome: PASS
+Unit Test Mapping: test_18_fully_booked_routes_counted
+
+--------------------------------------------------------------------------------
+Test ID: TC-11
+Scenario: Booking Report After Cancellation
+Input / Action: Book R101 (2 seats, Rs. 2,400) and R102 (1 seat, Rs. 2,000), then cancel R101 and generate report
+Expected Result: Cancelled count increases to 1; confirmed bookings = 1; confirmed revenue = Rs. 2,000 (Rs. 2,400 excluded).
+Actual Result: Cancelled bookings = 1, Confirmed bookings = 1, Reserved seats = 1, Confirmed revenue = Rs. 2,000. Correct exclusion verified.
+Outcome: PASS
+Unit Test Mapping: test_16_revenue_excludes_cancelled_fares
+
+--------------------------------------------------------------------------------
+Test ID: TC-12
+Scenario: Invalid Input Handling & Resilience
+Input / Action: Provide blank passenger name, negative age (-5), or non-numeric input
+Expected Result: Friendly validation errors displayed; system does not crash or corrupt application state.
+Actual Result: Input validation cleanly catches errors and displays descriptive user error notifications.
+Outcome: PASS
+Unit Test Mapping: test_07_empty_passenger_name_rejected, test_08_invalid_age_rejected
+
+--------------------------------------------------------------------------------
+Test ID: TC-13 (Extended)
+Scenario: Departure City Grouped Schedules
+Input / Action: Inspect route schedules grouped by departure city
+Expected Result: Uses supported cities tuple; groups Karachi (3 routes), Hyderabad (1), Sukkur (1); shows 'No scheduled departures' for Mirpur Khas and Lahore.
+Actual Result: Correctly grouped; Mirpur Khas and Lahore accurately display no scheduled departures.
+Outcome: PASS
+Unit Test Mapping: test_20_route_schedules_structure
+
+--------------------------------------------------------------------------------
+Test ID: TC-14 (Extended)
+Scenario: Filter Available Routes Only
+Input / Action: Toggle filter to display only routes with available seats when one route is fully booked
+Expected Result: Fully booked route is omitted via continue condition; only routes with remaining seats appear.
+Actual Result: Fully booked route excluded from the list; remaining 4 routes displayed.
+Outcome: PASS
+Unit Test Mapping: test_21_filter_available_routes
+================================================================================
+SUMMARY: 14 / 14 Scenarios PASSED. 22 Unit Tests Passed (100% success rate).
+================================================================================
