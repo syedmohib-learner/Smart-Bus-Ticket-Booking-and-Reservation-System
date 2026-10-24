@@ -1,6 +1,6 @@
 # 🚌 Smart Bus Ticket Booking & Reservation System
 
-A university hackathon and pair-programming project implementing a full-featured, interactive bus reservation management system in Python 3 and Streamlit.
+A hackathon and pair-programming project implementing a full-featured, interactive bus reservation management system in Python 3 and Streamlit.
 
 ---
 
